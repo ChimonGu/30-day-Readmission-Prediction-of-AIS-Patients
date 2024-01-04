@@ -263,15 +263,28 @@ def make_prediction_ecg(model, ecg_inputs):
     return predictions
 
 
-# Load model
+weights_url = "https://github.com/ChimonGu/30-day-Readmission-Prediction-of-AIS-Patients/releases/download/weights/saved_model_weights.zip"
+weights_path = "saved_model_weights.zip"
+response = requests.get(weights_url)
+
+with open(weights_path, 'wb') as f:
+    f.write(response.content)
+
+os.system(f"unzip {weights_path} -d saved_model/")
+
+# Load your model
 model_combined = SEInceptionCNN(clinical_input_shape=(15, ), ecg_input_shape=(5000, 12), num_classes=1)
-model_combined.load_weights(r"C:\Users\chimo\Desktop\python_project\#2-paper\二分类\ecg+clinical\saved_model\multimodel_lasso_cnnae+seinception_weights")
+# model_combined.load_weights(r"C:\Users\chimo\Desktop\python_project\#2-paper\二分类\ecg+clinical\saved_model\multimodel_lasso_cnnae+seinception_weights")
+model_combined.load_weights("saved_model/multimodel_lasso_cnnae+seinception_weights")
 
 model_clinical = Clinicalmodel(clinical_input_shape=(15,))
-model_clinical.load_weights(r"C:\Users\chimo\Desktop\python_project\#2-paper\二分类\ecg+clinical\saved_model\clinicalbranch_weights")
+# model_clinical.load_weights(r"C:\Users\chimo\Desktop\python_project\#2-paper\二分类\ecg+clinical\saved_model\clinicalbranch_weights")
+model_clinical.load_weights("saved_model/clinicalbranch_weights")
 
 model_ecg = AutoencoderClassifierModel(ecg_input_shape=(5000, 12))
-model_ecg.load_weights(r"C:\Users\chimo\Desktop\python_project\#2-paper\二分类\ecg\saved_model\cnnae_weights")
+# model_ecg.load_weights(r"C:\Users\chimo\Desktop\python_project\#2-paper\二分类\ecg\saved_model\cnnae_weights")
+model_ecg.load_weights("saved_model/cnnae_weights")
+
 
 # Streamlit app 
 st.title("30-Day Readmission Prediction of AIS Patients")
