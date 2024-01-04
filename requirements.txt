@@ -121,7 +121,6 @@ soupsieve==2.5
 stack-data==0.6.3
 streamlit==1.29.0
 tenacity==8.2.3
-tensorboard==2.10.1
 tensorboard-data-server==0.6.1
 tensorboard-plugin-wit==1.8.1
 tensorflow-estimator==2.10.0
@@ -151,7 +150,6 @@ webcolors==1.13
 webencodings==0.5.1
 websocket-client==1.6.4
 Werkzeug==2.3.7
-wfdb==4.0.0
 widgetsnbextension==4.0.9
 wrapt==1.15.0
 zipp==3.17.0
