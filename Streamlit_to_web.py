@@ -8,6 +8,8 @@ from tensorflow.keras.models import Sequential, Model
 from tensorflow.keras.layers import (LSTM, RepeatVector, TimeDistributed, Dense, BatchNormalization, GRU, Input,
                                      Conv1D, MaxPooling1D, UpSampling1D, Flatten, Dropout, Reshape, Attention)
 from tensorflow.keras.regularizers import l2
+import os
+import requests
 
 
 def sensitivity(y_true, y_pred):
