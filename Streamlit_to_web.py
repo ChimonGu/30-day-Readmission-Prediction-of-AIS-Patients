@@ -263,7 +263,7 @@ def make_prediction_ecg(model, ecg_inputs):
     return predictions
 
 
-# Load your model
+# Load model
 model_combined = SEInceptionCNN(clinical_input_shape=(15, ), ecg_input_shape=(5000, 12), num_classes=1)
 model_combined.load_weights(r"C:\Users\chimo\Desktop\python_project\#2-paper\二分类\ecg+clinical\saved_model\multimodel_lasso_cnnae+seinception_weights")
 
@@ -273,10 +273,10 @@ model_clinical.load_weights(r"C:\Users\chimo\Desktop\python_project\#2-paper\二
 model_ecg = AutoencoderClassifierModel(ecg_input_shape=(5000, 12))
 model_ecg.load_weights(r"C:\Users\chimo\Desktop\python_project\#2-paper\二分类\ecg\saved_model\cnnae_weights")
 
-# Streamlit app interface
+# Streamlit app 
 st.title("30-Day Readmission Prediction of AIS Patients")
 
-# Add input elements (e.g., file uploader, sliders, etc.)
+# Add input elements
 uploaded_file = st.file_uploader("Upload ECG file", type=["csv"])
 clinical_data = st.file_uploader("Upload Clinical file", type=["csv"])
 
