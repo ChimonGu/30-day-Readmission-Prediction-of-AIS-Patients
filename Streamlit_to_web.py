@@ -213,8 +213,10 @@ class AutoencoderClassifierModel(Model):
 
         return classification_output
 
+
 def scale_minmax(col):
     return (col-col.min())/(col.max()-col.min())
+
 
 def preprocess_clinical_data(clinical_inputs):
     X_clinical = clinical_inputs.iloc[:, 1:]
@@ -227,18 +229,17 @@ def preprocess_clinical_data(clinical_inputs):
     return X_clinical
 
 
-
 def preprocess_ecg_data(ecg_inputs):
-    X_ecg = ecg_inputs[['Lead_1', 'Lead_2', 'Lead_3', 'Lead_4', 'Lead_5', 'Lead_6', 'Lead_7', 'Lead_8',
-                        'Lead_9', 'Lead_10', 'Lead_11', 'Lead_12']]
     grouped_data = ecg_inputs.groupby('subject_id')
-    max_time_steps = grouped_data.size().max()
+    max_time_steps = 5000
     adjusted_data = np.zeros((len(grouped_data), max_time_steps, ecg_inputs.shape[1] - 1))
     scaler = StandardScaler()
 
     for i, (name, group) in enumerate(grouped_data):
         group_data = group.drop(columns=['subject_id'], axis=1).values
         group_data = scaler.fit_transform(group_data)
+        if group_data.shape[0] > max_time_steps:
+          group_data = group_data[:max_time_steps, :]
         adjusted_data[i, :len(group_data), :] = group_data
 
     X_ecg = adjusted_data
@@ -253,11 +254,13 @@ def make_prediction_combined(model, clinical_inputs, ecg_inputs):
 
     return predictions
 
+
 def make_prediction_clinical(model, clinical_inputs):
     X_clinical = preprocess_clinical_data(clinical_inputs)
     predictions = model.predict(X_clinical)
 
     return predictions
+
 
 def make_prediction_ecg(model, ecg_inputs):
     X_ecg = preprocess_ecg_data(ecg_inputs)
