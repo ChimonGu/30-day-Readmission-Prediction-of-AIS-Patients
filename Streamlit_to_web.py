@@ -105,7 +105,7 @@ class SEInceptionCNN(tf.keras.Model):
     def __init__(self, clinical_input_shape, ecg_input_shape, num_classes=1):
         super(SEInceptionCNN, self).__init__()
 
-        # Branch for processing clinical data
+        # Branch for processing EHR data
         self.clinical_branch = ClinicalBranch(clinical_input_shape)
 
         # Branch for processing ECG data
@@ -137,10 +137,9 @@ class SEInceptionCNN(tf.keras.Model):
         self.fc = tf.keras.layers.Dense(num_classes, activation='sigmoid')
 
     def call(self, inputs):
-        # Split inputs into clinical and ECG data
         clinical_inputs, ecg_inputs = inputs
 
-        # Process clinical data
+        # Process EHR data
         clinical_features = self.clinical_branch(clinical_inputs)
 
         # Process ECG data
@@ -164,7 +163,7 @@ class SEInceptionCNN(tf.keras.Model):
         ecg_features = self.global_avg_pooling(ecg_features)
         ecg_features = self.dropout(ecg_features)
 
-        # Concatenate or merge features from both branches
+        # Merge features from both branches
         merged_features = self.concat([clinical_features, ecg_features])
 
         # Final classification layer
@@ -206,7 +205,6 @@ class AutoencoderClassifierModel(Model):
         ])
 
     def call(self, inputs, training=None, mask=None):
-        # Forward pass
         encoded_features = self.encoder(inputs)
         decoded_features = self.decoder(encoded_features)
         classification_output = self.classification_model(decoded_features)
@@ -283,15 +281,12 @@ with ZipFile(weights_path, 'r') as zip_ref:
 
 # Load model
 model_combined = SEInceptionCNN(clinical_input_shape=(15, ), ecg_input_shape=(5000, 12), num_classes=1)
-# model_combined.load_weights(r"C:\Users\chimo\Desktop\python_project\#2-paper\二分类\ecg+clinical\saved_model\multimodel_lasso_cnnae+seinception_weights")
 model_combined.load_weights(os.path.join(absolute_extract_path, "saved_model_weights/multimodel_lasso_cnnae+seinception_weights"))
 
 model_clinical = Clinicalmodel(clinical_input_shape=(15,))
-# model_clinical.load_weights(r"C:\Users\chimo\Desktop\python_project\#2-paper\二分类\ecg+clinical\saved_model\clinicalbranch_weights")
 model_clinical.load_weights(os.path.join(absolute_extract_path, "saved_model_weights/clinicalbranch_weights"))
 
 model_ecg = AutoencoderClassifierModel(ecg_input_shape=(5000, 12))
-# model_ecg.load_weights(r"C:\Users\chimo\Desktop\python_project\#2-paper\二分类\ecg\saved_model\cnnae_weights")
 model_ecg.load_weights(os.path.join(absolute_extract_path, "saved_model_weights/cnnae_weights"))
 
 
@@ -305,12 +300,10 @@ clinical_data = st.file_uploader("Upload Clinical file", type=["csv"])
 if uploaded_file is not None or clinical_data is not None:
 
     if uploaded_file is not None and clinical_data is not None:
-
         ecg_data = pd.read_csv(uploaded_file)
         Clinical_data = pd.read_csv(clinical_data)
 
         if st.button("Predict"):
-            # Use model3 for prediction
             result = make_prediction_combined(model_combined, Clinical_data, ecg_data)
             result_df = pd.DataFrame(result, columns=['Readmission Probability'])
             result_df['Risk Level'] = pd.cut(result_df['Readmission Probability'], bins=[0, 0.2, 0.8, 1],
@@ -320,7 +313,6 @@ if uploaded_file is not None or clinical_data is not None:
             st.dataframe(result_df)
 
     elif uploaded_file is not None:
-
         ecg_data = pd.read_csv(uploaded_file)
 
         if st.button("Predict"):
@@ -333,7 +325,6 @@ if uploaded_file is not None or clinical_data is not None:
             st.dataframe(result_df)
 
     elif clinical_data is not None:
-
         Clinical_data = pd.read_csv(clinical_data)
 
         if st.button("Predict"):
